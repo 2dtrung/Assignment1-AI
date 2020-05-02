@@ -61,6 +61,28 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+"""def GraphSearch(problem,frontier):
+    start_state = problem.getStartState()
+    explored = set()
+    frontier.push((start_state,[]))
+    while True:
+        popped_element = frontier.pop()
+        node = popped_element[0]
+        path_till_node = popped_element[1]
+        if problem.isGoalState(node):
+            break;
+        else:
+            if node not in explored:   # Skipping already visited nodes
+                explored.add(node)     # Adding newly encountered nodes to the set of visited nodes
+                for successor in problem.getSuccessors(node):
+                    child_node = successor[0]
+                    child_path = successor[1]
+                    full_path = path_till_node + [child_path]  # Computing path of child node from start node
+                    frontier.push((child_node, full_path)) # Pushing ('Child Node',[Full Path]) to the fringe
+    
+    return path_till_node
+"""        
+
 
 def tinyMazeSearch(problem):
     """
@@ -87,17 +109,64 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.Stack()  # Fringe (Stack) to store the nodes along with their paths
+    init_state = problem.getStartState()
+    visited = set()  # A set to maintain all the visited nodes
+    fringe.push((init_state,[]))  # Pushing (Node, [Path from start-node till 'Node']) to the fringe
+    while True:
+        node, path_till_node = fringe.pop()
+        if problem.isGoalState(node):  # Exit on encountering goal node
+            break
+        else:
+            if node not in visited:   # Skipping already visited nodes
+                visited.add(node)     # Adding newly encountered nodes to the set of visited nodes
+                for success in problem.getSuccessors(node):
+                    n_state = success[0]
+                    n_direction = success[1]
+                    fringe.push((n_state, path_till_node+ [n_direction])) # Pushing ('Child Node',[Full Path]) to the fringe
+    return path_till_node
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.Queue()
+    init_state = problem.getStartState()
+    visited = set()  # A set to maintain all the visited nodes
+    fringe.push((init_state,[]))  # Pushing (Node, [Path from start-node till 'Node']) to the fringe
+    while True:
+        node, path_till_node = fringe.pop()
+        if problem.isGoalState(node):  # Exit on encountering goal node
+            break
+        else:
+            if node not in visited:   # Skipping already visited nodes
+                visited.add(node)     # Adding newly encountered nodes to the set of visited nodes
+                for success in problem.getSuccessors(node):
+                    n_state = success[0]
+                    n_direction = success[1]
+                    fringe.push((n_state, path_till_node+ [n_direction])) # Pushing ('Child Node',[Full Path]) to the fringe
+    return path_till_node
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    init_state = problem.getStartState()
+    visited = set()  # A set to maintain all the visited nodes
+    fringe.push((init_state,[],0),0)  # Pushing (Node, [Path from start-node till 'Node']) to the fringe
+    while True:
+        node, path_till_node, cost_till_node = fringe.pop()
+        if problem.isGoalState(node):  # Exit on encountering goal node
+            break
+        else:
+            if node not in visited:   # Skipping already visited nodes
+                visited.add(node)     # Adding newly encountered nodes to the set of visited nodes
+                for success in problem.getSuccessors(node):
+                    n_state = success[0]
+                    n_direction = success[1]
+                    n_cost = success[2]
+                    fringe.push((n_state, path_till_node+ [n_direction],n_cost+cost_till_node),cost_till_node+n_cost) # Pushing ('Child Node',[Full Path]) to the fringe
+    return path_till_node
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +178,23 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    init_state = problem.getStartState()
+    visited = set()  # A set to maintain all the visited nodes
+    fringe.push((init_state,[],0),heuristic(init_state,problem)+0)  # Pushing (Node, [Path from start-node till 'Node']) to the fringe
+    while True:
+        node, path_till_node, cost_till_node = fringe.pop()
+        if problem.isGoalState(node):  # Exit on encountering goal node
+            break
+        else:
+            if node not in visited:   # Skipping already visited nodes
+                visited.add(node)     # Adding newly encountered nodes to the set of visited nodes
+                for success in problem.getSuccessors(node):
+                    n_state = success[0]
+                    n_direction = success[1]
+                    n_cost = success[2]
+                    fringe.push((n_state, path_till_node+ [n_direction],n_cost+cost_till_node),cost_till_node+n_cost+heuristic(n_state,problem)) # Pushing ('Child Node',[Full Path]) to the fringe
+    return path_till_node
 
 
 # Abbreviations
