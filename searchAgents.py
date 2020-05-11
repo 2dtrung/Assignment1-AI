@@ -295,14 +295,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return (self.startingPosition,self.corners)  # State = ((current position), (a tuple listing all the corners that haven't yet been visited))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        isGoal = (len(state[1]) == 0)
+        return isGoal
 
     def getSuccessors(self, state):
         """
@@ -325,6 +327,17 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextState = (nextx, nexty)  # Forming the position of the successor
+                cost = 1
+                corners_tuple = state[1]
+                corners_set = set(corners_tuple)
+                if nextState in self.corners and nextState in corners_set:  # Removing the corner from the state tuple in case the new state is an unvisited corner.
+                    corners_set.remove(nextState)
+                successors.append(((nextState, tuple(corners_set)), action, cost))  # Adding to the successors list
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,8 +373,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    corners_tuple = state[1]
+    corners_list = list(corners_tuple)  # Obtain all the unvisted corners
+    distance_to_farthest_corner = -1 # Initializa distance to -1
+    farthest_corner = ()
+    for corner in corners_list:
+        if (distance_to_farthest_corner == -1) or (distance_to_farthest_corner < util.manhattanDistance(corner, state[0])): # Update farthest corner and distance
+            farthest_corner = tuple(corner)
+            distance_to_farthest_corner = util.manhattanDistance(farthest_corner, state[0])
 
+    if len(farthest_corner) == 0:
+        return 0
+
+    return distance_to_farthest_corner
+    
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
